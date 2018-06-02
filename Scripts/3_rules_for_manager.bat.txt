@@ -1,0 +1,47 @@
+﻿REM example
+REM cmd C:\Users\Администратор\desktop> 3_rules_for_manager.bat
+REM See information about group:
+
+REM check DACL for AccoutManagers:
+REM dsacls.exe cn=AccountManagers,ou=Administration,dc=ibks,dc=com
+
+
+REM CN = Common Name; OU = Organizational Unit; DC = Domain Component
+
+REM /I - параметр для указания флага наследования
+REM :T - наследуемые права доступа распространяются к этому объекту и подобъектам
+REM :S - наследуемые права доступа распространяются только на подобъекты
+REM /G - группа
+
+REM CC - создать дочерний объект
+REM ;user - только пользовательские объекты
+REM GR - Generic Read, GW - Generic Write
+REM CA - Control access right
+REM RP - Read property, RW - Write property
+REM pwdLastSet - поменять пароль при след. входе
+REM lockoutTime - может разблокировать пользователя
+
+REM Утилита командной строки DSACLS.EXE позволяет просматривать и 
+REM изменять права доступа пользователей и групп пользователей
+
+dsacls.exe ou=Administration,dc=ibks,dc=com /I:T /G "ibks\AccountManagers":CC;user
+dsacls.exe ou=Administration,dc=ibks,dc=com /I:S /G "ibks\AccountManagers":GRGW;;user
+dsacls.exe ou=Administration,dc=ibks,dc=com /I:S /G "ibks\AccountManagers":CA;"Reset Password";user
+dsacls.exe ou=Administration,dc=ibks,dc=com /I:S /G "ibks\AccountManagers":RPWP;pwdLastSet;user
+dsacls.exe ou=Administration,dc=ibks,dc=com /I:S /G "ibks\HelpDesk":RPWP;lockoutTime;user
+
+
+REM dsmod group - Изменяет атрибуты одной или нескольких существующих групп в каталоге
+REM -addmbr - Указывает, что члены группы, заданные параметром, добавляются к группе
+REM IIS_IUSRS - Встроенная группа, которую используют службы IIS (Internet Information Services)
+REM Builtin - Встроенные группы
+
+dsmod group "cn=IIS_IUSRS,cn=Builtin,dc=ibks,dc=com" -addmbr "cn=ResourceAdmins,ou=Administration,dc=ibks,dc=com"
+
+
+REM Если Windows английская cn = Administrators
+REM dsmod group "cn=Administrators,cn=Builtin,dc=ibks,dc=com" -addmbr "cn=GeneralAdmins,ou=Administration,dc=ibks,dc=com"
+
+REM Если используются русские имена, то необходимо сделать кодировку OEM 866, или вбейте команду руками
+REM Если Windows русская cn = Администраторы
+dsmod group "cn=Администраторы,cn=Builtin,dc=ibks,dc=com" -addmbr "cn=GeneralAdmins,ou=Administration,dc=ibks,dc=com"

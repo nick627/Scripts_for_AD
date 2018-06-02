@@ -1,0 +1,2 @@
+mkdir \\NAMESERVER\SharedFolder\%ComputerName%
+net use L: \\NAMESERVER\SharedFolder\%ComputerName%
